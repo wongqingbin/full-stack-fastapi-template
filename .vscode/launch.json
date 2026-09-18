@@ -1,29 +1,51 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Debug FastAPI Project backend: Python Debugger",
-            "type": "debugpy",
-            "request": "launch",
-            "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-            "module": "uvicorn",
-            "args": [
-                "app.main:app",
-                "--reload"
-            ],
-            "cwd": "${workspaceFolder}/backend",
-            "jinja": true,
-            "envFile": "${workspaceFolder}/.env"
-        },
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Debug Frontend: Launch Chrome against http://localhost:5173",
-            "url": "http://localhost:5173",
-            "webRoot": "${workspaceFolder}/frontend"
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug FastAPI backend",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "module": "uvicorn",
+      "args": [
+        "app.main:app",
+        "--reload"
+      ],
+      "cwd": "${workspaceFolder}/backend",
+      "jinja": true,
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Debug frontend dev server",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "preLaunchTask": "Wait for FastAPI",
+      "program": "${workspaceFolder}/node_modules/vite/bin/vite.js",
+      "args": [
+        "--strictPort",
+        "--force"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Debug frontend in Chrome",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend",
+      "preLaunchTask": "Wait for Vite"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug full stack",
+      "configurations": [
+        "Debug FastAPI backend",
+        "Debug frontend dev server",
+        "Debug frontend in Chrome"
+      ],
+      "stopAll": true
+    }
+  ]
 }

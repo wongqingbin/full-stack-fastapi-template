@@ -13,7 +13,9 @@ repos:
         exclude: |
             (?x)^(
                 frontend/src/client/.*|
-                backend/app/email-templates/.*
+                backend/app/email-templates/.*|
+                \.agents/.*|
+                \.claude/.*
             )$
       - id: trailing-whitespace
         exclude: ^frontend/src/client/.*

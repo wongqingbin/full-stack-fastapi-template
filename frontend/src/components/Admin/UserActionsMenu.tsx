@@ -1,11 +1,13 @@
 import { EllipsisVertical } from "lucide-react"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import type { UserPublic } from "@/client"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import useAuth from "@/hooks/useAuth"
@@ -19,6 +21,7 @@ interface UserActionsMenuProps {
 export const UserActionsMenu = ({ user }: UserActionsMenuProps) => {
   const [open, setOpen] = useState(false)
   const { user: currentUser } = useAuth()
+  const { t } = useTranslation()
 
   if (user.id === currentUser?.id) {
     return null
@@ -27,13 +30,15 @@ export const UserActionsMenu = ({ user }: UserActionsMenuProps) => {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" aria-label={t("common.actions")}>
           <EllipsisVertical />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <EditUser user={user} onSuccess={() => setOpen(false)} />
-        <DeleteUser id={user.id} onSuccess={() => setOpen(false)} />
+        <DropdownMenuGroup>
+          <EditUser user={user} onSuccess={() => setOpen(false)} />
+          <DeleteUser id={user.id} onSuccess={() => setOpen(false)} />
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )

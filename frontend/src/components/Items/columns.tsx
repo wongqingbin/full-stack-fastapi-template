@@ -1,4 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
+import type { TFunction } from "i18next"
 import { Check, Copy } from "lucide-react"
 
 import type { ItemPublic } from "@/client"
@@ -7,7 +8,7 @@ import { useCopyToClipboard } from "@/hooks/useCopyToClipboard"
 import { cn } from "@/lib/utils"
 import { ItemActionsMenu } from "./ItemActionsMenu"
 
-function CopyId({ id }: { id: string }) {
+function CopyId({ id, label }: { id: string; label: string }) {
   const [copiedText, copy] = useCopyToClipboard()
   const isCopied = copiedText === id
 
@@ -19,34 +20,36 @@ function CopyId({ id }: { id: string }) {
         size="icon"
         className="size-6 opacity-0 group-hover:opacity-100 transition-opacity"
         onClick={() => copy(id)}
+        aria-label={label}
       >
         {isCopied ? (
-          <Check className="size-3 text-green-500" />
+          <Check className="size-3 text-primary" />
         ) : (
           <Copy className="size-3" />
         )}
-        <span className="sr-only">Copy ID</span>
       </Button>
     </div>
   )
 }
 
-export const columns: ColumnDef<ItemPublic>[] = [
+export const getColumns = (t: TFunction): ColumnDef<ItemPublic>[] => [
   {
     accessorKey: "id",
     header: "ID",
-    cell: ({ row }) => <CopyId id={row.original.id} />,
+    cell: ({ row }) => (
+      <CopyId id={row.original.id} label={t("items.copyId")} />
+    ),
   },
   {
     accessorKey: "title",
-    header: "Title",
+    header: t("common.title"),
     cell: ({ row }) => (
       <span className="font-medium">{row.original.title}</span>
     ),
   },
   {
     accessorKey: "description",
-    header: "Description",
+    header: t("common.description"),
     cell: ({ row }) => {
       const description = row.original.description
       return (
@@ -56,14 +59,14 @@ export const columns: ColumnDef<ItemPublic>[] = [
             !description && "italic",
           )}
         >
-          {description || "No description"}
+          {description || t("items.noDescription")}
         </span>
       )
     },
   },
   {
     id: "actions",
-    header: () => <span className="sr-only">Actions</span>,
+    header: () => <span className="sr-only">{t("common.actions")}</span>,
     cell: ({ row }) => (
       <div className="flex justify-end">
         <ItemActionsMenu item={row.original} />

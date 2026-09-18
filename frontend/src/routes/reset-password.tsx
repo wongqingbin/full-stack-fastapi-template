@@ -7,6 +7,7 @@ import {
   useNavigate,
 } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import { LoginService } from "@/client"
@@ -23,6 +24,8 @@ import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
 import { isLoggedIn } from "@/hooks/useAuth"
 import useCustomToast from "@/hooks/useCustomToast"
+import { useDocumentTitle } from "@/hooks/useDocumentTitle"
+import i18n from "@/i18n"
 import { handleError } from "@/utils"
 
 const searchSchema = z.object({
@@ -33,14 +36,14 @@ const formSchema = z
   .object({
     new_password: z
       .string()
-      .min(1, { message: "Password is required" })
-      .min(8, { message: "Password must be at least 8 characters" }),
+      .min(1, { message: "validation.passwordRequired" })
+      .min(8, { message: "validation.passwordMin" }),
     confirm_password: z
       .string()
-      .min(1, { message: "Password confirmation is required" }),
+      .min(1, { message: "validation.passwordConfirmationRequired" }),
   })
   .refine((data) => data.new_password === data.confirm_password, {
-    message: "The passwords don't match",
+    message: "validation.passwordsMismatch",
     path: ["confirm_password"],
   })
 
@@ -60,7 +63,7 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
       {
-        title: "Reset Password - FastAPI Template",
+        title: i18n.t("meta.resetPassword"),
       },
     ],
   }),
@@ -68,6 +71,8 @@ export const Route = createFileRoute("/reset-password")({
 
 function ResetPassword() {
   const { token } = Route.useSearch()
+  const { t } = useTranslation()
+  useDocumentTitle("meta.resetPassword")
   const { showSuccessToast, showErrorToast } = useCustomToast()
   const navigate = useNavigate()
 
@@ -85,7 +90,7 @@ function ResetPassword() {
     mutationFn: (data: { new_password: string; token: string }) =>
       LoginService.resetPassword({ body: data }),
     onSuccess: () => {
-      showSuccessToast("Password updated successfully")
+      showSuccessToast(t("auth.resetPassword.success"))
       form.reset()
       navigate({ to: "/login" })
     },
@@ -104,7 +109,9 @@ function ResetPassword() {
           className="flex flex-col gap-6"
         >
           <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Reset Password</h1>
+            <h1 className="text-2xl font-bold">
+              {t("auth.resetPassword.heading")}
+            </h1>
           </div>
 
           <div className="grid gap-4">
@@ -113,11 +120,11 @@ function ResetPassword() {
               name="new_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel>{t("common.newPassword")}</FormLabel>
                   <FormControl>
                     <PasswordInput
                       data-testid="new-password-input"
-                      placeholder="New Password"
+                      placeholder={t("common.newPassword")}
                       {...field}
                     />
                   </FormControl>
@@ -131,11 +138,11 @@ function ResetPassword() {
               name="confirm_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>{t("common.confirmPassword")}</FormLabel>
                   <FormControl>
                     <PasswordInput
                       data-testid="confirm-password-input"
-                      placeholder="Confirm Password"
+                      placeholder={t("common.confirmPassword")}
                       {...field}
                     />
                   </FormControl>
@@ -149,14 +156,14 @@ function ResetPassword() {
               className="w-full"
               loading={mutation.isPending}
             >
-              Reset Password
+              {t("auth.resetPassword.submit")}
             </LoadingButton>
           </div>
 
           <div className="text-center text-sm">
-            Remember your password?{" "}
+            {t("auth.resetPassword.rememberPassword")}{" "}
             <RouterLink to="/login" className="underline underline-offset-4">
-              Log in
+              {t("auth.resetPassword.loginLink")}
             </RouterLink>
           </div>
         </form>

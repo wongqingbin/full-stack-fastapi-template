@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Plus } from "lucide-react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
 import { type UserCreate, UsersService } from "@/client"
@@ -33,20 +34,20 @@ import { handleError } from "@/utils"
 
 const formSchema = z
   .object({
-    email: z.email({ message: "Invalid email address" }),
+    email: z.email({ message: "validation.invalidEmail" }),
     full_name: z.string().optional(),
     password: z
       .string()
-      .min(1, { message: "Password is required" })
-      .min(8, { message: "Password must be at least 8 characters" }),
+      .min(1, { message: "validation.passwordRequired" })
+      .min(8, { message: "validation.passwordMin" }),
     confirm_password: z
       .string()
-      .min(1, { message: "Please confirm your password" }),
+      .min(1, { message: "validation.confirmPassword" }),
     is_superuser: z.boolean(),
     is_active: z.boolean(),
   })
   .refine((data) => data.password === data.confirm_password, {
-    message: "The passwords don't match",
+    message: "validation.passwordsMismatch",
     path: ["confirm_password"],
   })
 
@@ -56,6 +57,7 @@ const AddUser = () => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
   const { showSuccessToast, showErrorToast } = useCustomToast()
+  const { t } = useTranslation()
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -74,7 +76,7 @@ const AddUser = () => {
   const mutation = useMutation({
     mutationFn: (data: UserCreate) => UsersService.createUser({ body: data }),
     onSuccess: () => {
-      showSuccessToast("User created successfully")
+      showSuccessToast(t("admin.created"))
       form.reset()
       setIsOpen(false)
     },
@@ -93,15 +95,13 @@ const AddUser = () => {
       <DialogTrigger asChild>
         <Button className="my-4">
           <Plus className="mr-2" />
-          Add User
+          {t("admin.add")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add User</DialogTitle>
-          <DialogDescription>
-            Fill in the form below to add a new user to the system.
-          </DialogDescription>
+          <DialogTitle>{t("admin.add")}</DialogTitle>
+          <DialogDescription>{t("admin.addDescription")}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -112,11 +112,12 @@ const AddUser = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Email <span className="text-destructive">*</span>
+                      {t("common.email")}{" "}
+                      <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Email"
+                        placeholder={t("common.email")}
                         type="email"
                         {...field}
                         required
@@ -132,9 +133,13 @@ const AddUser = () => {
                 name="full_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>{t("common.fullName")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Full name" type="text" {...field} />
+                      <Input
+                        placeholder={t("common.fullName")}
+                        type="text"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -147,11 +152,12 @@ const AddUser = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Set Password <span className="text-destructive">*</span>
+                      {t("admin.setPassword")}{" "}
+                      <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Password"
+                        placeholder={t("common.password")}
                         type="password"
                         {...field}
                         required
@@ -168,12 +174,12 @@ const AddUser = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Confirm Password{" "}
+                      {t("common.confirmPassword")}{" "}
                       <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Password"
+                        placeholder={t("common.password")}
                         type="password"
                         {...field}
                         required
@@ -195,7 +201,9 @@ const AddUser = () => {
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <FormLabel className="font-normal">Is superuser?</FormLabel>
+                    <FormLabel className="font-normal">
+                      {t("admin.isSuperuser")}
+                    </FormLabel>
                   </FormItem>
                 )}
               />
@@ -211,7 +219,9 @@ const AddUser = () => {
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <FormLabel className="font-normal">Is active?</FormLabel>
+                    <FormLabel className="font-normal">
+                      {t("admin.isActive")}
+                    </FormLabel>
                   </FormItem>
                 )}
               />
@@ -220,11 +230,11 @@ const AddUser = () => {
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline" disabled={mutation.isPending}>
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
               </DialogClose>
               <LoadingButton type="submit" loading={mutation.isPending}>
-                Save
+                {t("common.save")}
               </LoadingButton>
             </DialogFooter>
           </form>

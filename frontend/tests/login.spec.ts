@@ -1,5 +1,6 @@
-import { expect, type Page, test } from "@playwright/test"
+import type { Page } from "@playwright/test"
 import { firstSuperuser, firstSuperuserPassword } from "./config.ts"
+import { expect, test } from "./fixtures"
 import { randomPassword } from "./utils/random.ts"
 
 test.use({ storageState: { cookies: [], origins: [] } })

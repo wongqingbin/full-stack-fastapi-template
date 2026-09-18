@@ -1,6 +1,8 @@
 import { Briefcase, Home, Users } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { SidebarAppearance } from "@/components/Common/Appearance"
+import { SidebarLanguageSwitcher } from "@/components/Common/LanguageSwitcher"
 import { Logo } from "@/components/Common/Logo"
 import {
   Sidebar,
@@ -12,16 +14,19 @@ import useAuth from "@/hooks/useAuth"
 import { type Item, Main } from "./Main"
 import { User } from "./User"
 
-const baseItems: Item[] = [
-  { icon: Home, title: "Dashboard", path: "/" },
-  { icon: Briefcase, title: "Items", path: "/items" },
-]
-
 export function AppSidebar() {
   const { user: currentUser } = useAuth()
+  const { t } = useTranslation()
 
+  const baseItems: Item[] = [
+    { icon: Home, title: t("navigation.dashboard"), path: "/" },
+    { icon: Briefcase, title: t("navigation.items"), path: "/items" },
+  ]
   const items = currentUser?.is_superuser
-    ? [...baseItems, { icon: Users, title: "Admin", path: "/admin" }]
+    ? [
+        ...baseItems,
+        { icon: Users, title: t("navigation.admin"), path: "/admin" },
+      ]
     : baseItems
 
   return (
@@ -33,6 +38,7 @@ export function AppSidebar() {
         <Main items={items} />
       </SidebarContent>
       <SidebarFooter>
+        <SidebarLanguageSwitcher />
         <SidebarAppearance />
         <User user={currentUser} />
       </SidebarFooter>

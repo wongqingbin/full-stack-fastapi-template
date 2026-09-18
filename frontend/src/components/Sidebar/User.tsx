@@ -1,5 +1,6 @@
 import { Link as RouterLink } from "@tanstack/react-router"
 import { ChevronsUpDown, LogOut, Settings } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -29,7 +30,7 @@ function UserInfo({ fullName, email }: UserInfoProps) {
     <div className="flex items-center gap-2.5 w-full min-w-0">
       <Avatar className="size-8">
         <AvatarFallback className="bg-zinc-600 text-white">
-          {getInitials(fullName || "User")}
+          {getInitials(fullName || "U")}
         </AvatarFallback>
       </Avatar>
       <div className="flex flex-col items-start min-w-0">
@@ -43,6 +44,7 @@ function UserInfo({ fullName, email }: UserInfoProps) {
 export function User({ user }: { user: any }) {
   const { logout } = useAuth()
   const { isMobile, setOpenMobile } = useSidebar()
+  const { t } = useTranslation()
 
   if (!user) return null
 
@@ -82,12 +84,12 @@ export function User({ user }: { user: any }) {
             <RouterLink to="/settings" onClick={handleMenuClick}>
               <DropdownMenuItem>
                 <Settings />
-                User Settings
+                {t("navigation.userSettings")}
               </DropdownMenuItem>
             </RouterLink>
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
-              Log Out
+              {t("navigation.logOut")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

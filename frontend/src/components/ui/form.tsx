@@ -11,6 +11,8 @@ import {
   type FieldValues,
 } from "react-hook-form"
 
+import { useTranslation } from "react-i18next"
+
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 
@@ -135,9 +137,14 @@ function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
 
 function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
   const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message ?? "") : props.children
+  const { t, i18n } = useTranslation()
+  const body = error ? String(error.message ?? "") : props.children
+  const message =
+    typeof body === "string" && i18n.exists(body)
+      ? t(body, { defaultValue: body })
+      : body
 
-  if (!body) {
+  if (!message) {
     return null
   }
 
@@ -148,7 +155,7 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
       className={cn("text-destructive text-sm", className)}
       {...props}
     >
-      {body}
+      {message}
     </p>
   )
 }

@@ -1,13 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 
 import useAuth from "@/hooks/useAuth"
+import { useDocumentTitle } from "@/hooks/useDocumentTitle"
+import i18n from "@/i18n"
 
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
   head: () => ({
     meta: [
       {
-        title: "Dashboard - FastAPI Template",
+        title: i18n.t("meta.dashboard"),
       },
     ],
   }),
@@ -15,16 +18,18 @@ export const Route = createFileRoute("/_layout/")({
 
 function Dashboard() {
   const { user: currentUser } = useAuth()
+  const { t } = useTranslation()
+  useDocumentTitle("meta.dashboard")
 
   return (
     <div>
       <div>
         <h1 className="text-2xl truncate max-w-sm">
-          Hi, {currentUser?.full_name || currentUser?.email} 👋
+          {t("dashboard.greeting", {
+            name: currentUser?.full_name || currentUser?.email,
+          })}
         </h1>
-        <p className="text-muted-foreground">
-          Welcome back, nice to see you again!!!
-        </p>
+        <p className="text-muted-foreground">{t("dashboard.welcome")}</p>
       </div>
     </div>
   )

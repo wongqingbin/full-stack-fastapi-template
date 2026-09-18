@@ -1,17 +1,34 @@
 import { AxiosError } from "axios"
 
+import i18n from "@/i18n"
+
+const API_ERROR_KEYS: Record<string, string> = {
+  "Incorrect email or password": "errors.api.incorrectCredentials",
+  "Invalid token": "errors.api.invalidToken",
+  "Inactive user": "errors.api.inactiveUser",
+  "The user with this email already exists in the system":
+    "errors.api.emailExists",
+  "New password cannot be the same as the current one":
+    "errors.api.samePassword",
+}
+
+const translateErrorMessage = (message: string) => {
+  const translationKey = API_ERROR_KEYS[message]
+  return translationKey ? i18n.t(translationKey) : message
+}
+
 function extractErrorMessage(err: Error): string {
   if (err instanceof AxiosError) {
     const errDetail = (err.response?.data as any)?.detail
     if (Array.isArray(errDetail) && errDetail.length > 0) {
-      return errDetail[0].msg
+      return translateErrorMessage(errDetail[0].msg)
     }
     if (typeof errDetail === "string") {
-      return errDetail
+      return translateErrorMessage(errDetail)
     }
-    return err.message
+    return translateErrorMessage(err.message)
   }
-  return "Something went wrong."
+  return i18n.t("errors.generic")
 }
 
 export const handleError = function (this: (msg: string) => void, err: Error) {
